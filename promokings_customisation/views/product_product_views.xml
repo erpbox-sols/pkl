@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="product_normal_form_view_inherit_promo_kings" model="ir.ui.view">
+        <field name="name">product.product.form.inherit.promo.kings</field>
+        <field name="model">product.product</field>
+        <field name="inherit_id" ref="product.product_normal_form_view"/>
+        <field name="arch" type="xml">
+            <group name="bill" position="after">
+                <group>
+                    <field name="po_link_product_id"/>
+                    <field name="vendor_id"/>
+                    <field name="mo_link_product_id"/>
+                    <field name="ext_id_map" readonly="1" string="Ext Product ID"/>
+                </group>
+            </group>
+        </field>
+    </record>
+
+    <record model="ir.ui.view" id="product_template_inherit_promo_kings">
+        <field name="name">product.template.form.promo.kings</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_only_form_view"/>
+        <field name="arch" type="xml">
+        <xpath expr="//field[@name='uom_po_id']" position="after">
+                <field name="ext_tmpl_id_map" string="Ext Template ID" readonly="1"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

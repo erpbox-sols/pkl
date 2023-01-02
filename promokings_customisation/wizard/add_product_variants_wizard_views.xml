@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="view_add_product_variants_wizard_form" model="ir.ui.view">
+            <field name="name">add.product.variants.wizard.form</field>
+            <field name="model">add.product.variants.wizard</field>
+            <field name="arch" type="xml">
+                <form>
+                    <group>
+                        <group>
+                            <field name="sale_order_id" invisible="1"/>
+                            <field name="product_template_ids" widget="many2many_tags"/>
+                            <field name="customise"/>
+                        </group>
+                        <group>
+                            <label for="product_uom_qty"/>
+                            <div>
+                                <field name="product_uom_qty" class="oe_inline"/>
+                                <span class="oe_inline ml4">
+                                    <field name="product_uom_id"/>
+                                </span>
+                            </div>
+                            <field name="customisation_details"/>
+                        </group>
+                    </group>
+                    <field name="line_ids">
+                        <tree editable="bottom">
+                            <field name="product_id"
+                                   options="{'no_create_edit': True,'no_create': True, 'no_open': True}"/>
+                            <field name="product_uom_qty"/>
+                            <field name="product_uom_id"
+                                   options="{'no_create_edit': True,'no_create': True, 'no_open': True}"/>
+                            <field name="price_unit"/>
+                        </tree>
+                    </field>
+                    <footer>
+                        <button string="Add" name="add_product_variants_to_order_line" type="object"
+                                class="oe_highlight"/>
+                        <button string="Cancel" class="btn btn-secondary" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <record id="add_product_variants_wizard_action" model="ir.actions.act_window">
+            <field name="name">Add Product Variants</field>
+            <field name="res_model">add.product.variants.wizard</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+        </record>
+    </data>
+</odoo>

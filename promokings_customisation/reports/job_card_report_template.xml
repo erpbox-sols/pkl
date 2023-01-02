@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="report_job_card_template">
+        <t t-call="web.external_layout">
+            <t t-set="doc" t-value="doc.with_context(lang=doc.partner_id.lang)"/>
+            <t t-set="forced_vat"
+               t-value="doc.fiscal_position_id.foreign_vat"/> <!-- So that it appears in the footer of the report instead of the company VAT if it's set -->
+            <t t-set="address">
+                <div t-field="doc.partner_id"
+                     t-options='{"widget": "contact", "fields": ["address", "name"], "no_marker": True}'/>
+                <p t-if="doc.partner_id.vat">
+                    <t t-esc="doc.company_id.account_fiscal_country_id.vat_label or 'Tax ID'"/>
+                    :
+                    <span t-field="doc.partner_id.vat"/>
+                </p>
+            </t>
+            <t t-if="doc.partner_shipping_id == doc.partner_invoice_id
+                             and doc.partner_invoice_id != doc.partner_id
+                             or doc.partner_shipping_id != doc.partner_invoice_id">
+                <t t-set="information_block">
+                    <strong t-if="doc.partner_shipping_id == doc.partner_invoice_id">
+                        Invoicing and Shipping Address:
+                    </strong>
+                    <strong t-if="doc.partner_shipping_id != doc.partner_invoice_id">
+                        Invoicing Address:
+                    </strong>
+                    <div t-field="doc.partner_invoice_id"
+                         t-options='{"widget": "contact", "fields": ["address", "name", "phone"], "no_marker": True, "phone_icons": True}'/>
+                    <t t-if="doc.partner_shipping_id != doc.partner_invoice_id">
+                        <strong>
+                            Shipping Address:
+                        </strong>
+                        <div t-field="doc.partner_shipping_id"
+                             t-options='{"widget": "contact", "fields": ["address", "name", "phone"], "no_marker": True, "phone_icons": True}'/>
+                    </t>
+                </t>
+            </t>
+            <div class="page">
+                <div class="oe_structure"/>
+
+                <h2 class="mt16">
+                    <span t-if="doc.state not in ['draft','sent']">Order #</span>
+                    <span t-if="doc.state in ['draft','sent']">Quotation #</span>
+                    <span t-field="doc.name"/>
+                </h2>
+
+                <div class="row mt32 mb32" id="informations">
+                    <div t-if="doc.client_order_ref" class="col-auto col-3 mw-100 mb-2">
+                        <strong>Your Reference:</strong>
+                        <p class="m-0" t-field="doc.client_order_ref"/>
+                    </div>
+                    <div t-if="doc.date_order and doc.state not in ['draft','sent']" class="col-auto col-3 mw-100 mb-2">
+                        <strong>Order Date:</strong>
+                        <p class="m-0" t-field="doc.date_order"/>
+                    </div>
+                    <div t-if="doc.date_order and doc.state in ['draft','sent']" class="col-auto col-3 mw-100 mb-2">
+                        <strong>Quotation Date:</strong>
+                        <p class="m-0" t-field="doc.date_order" t-options='{"widget": "date"}'/>
+                    </div>
+                    <div t-if="doc.validity_date and doc.state in ['draft', 'sent']" class="col-auto col-3 mw-100 mb-2"
+                         name="expiration_date">
+                        <strong>Expiration:</strong>
+                        <p class="m-0" t-field="doc.validity_date"/>
+                    </div>
+                    <div t-if="doc.user_id.name" class="col-auto col-3 mw-100 mb-2">
+                        <strong>Salesperson:</strong>
+                        <p class="m-0" t-field="doc.user_id"/>
+                    </div>
+                </div>
+
+                <t t-set="total_qty" t-value="0"/>
+                <t t-set="serial_no" t-value="1"/>
+
+                <table class="table table-sm o_main_table">
+                    <!-- In case we want to repeat the header, remove "display: table-row-group" -->
+                    <thead style="display: table-row-group">
+                        <tr>
+                            <th name="th_sno" style="width:6%" class="text-left">SNo.</th>
+<!--                            <th name="th_image" style="width:14%" class="text-center">Image</th>-->
+                            <th name="th_description" class="text-left" style="width:40%">Description</th>
+                            <t t-if="doc.order_line and doc.state in ['draft','sent']">
+                                <th name="th_delivery_time" class="text-left">Delivery Time</th>
+                            </t>
+                            <t t-else="">
+                                <th name="th_delivery_time" class="text-left">Delivery Date</th>
+                            </t>
+<!--                            <th name="th_customisation_details" class="text-left">Customisation Details</th>-->
+                            <th name="th_customisation_type" class="text-left">Customisation Type</th>
+                            <th name="th_quantity" class="text-right">Quantity</th>
+                        </tr>
+                    </thead>
+                    <tbody class="sale_tbody">
+                        <t t-foreach="doc.order_line" t-as="line">
+                            <tr t-att-class="'bg-200 font-weight-bold o_line_section' if line.display_type == 'line_section' else 'font-italic o_line_note' if line.display_type == 'line_note' else ''">
+                                <t t-if="not line.display_type">
+                                    <td name="td_sno" class="text-center">
+                                        <span t-esc="serial_no"/>
+                                        <t t-set="serial_no" t-value="serial_no+1"/>
+                                    </td>
+<!--                                    <td name="td_image" class="text-center">-->
+<!--                                        <img t-attf-src="data:image/*;base64,{{line.art_work_image}}" style="width: 50%;height: 10%;" />-->
+<!--                                    </td>-->
+                                    <td name="td_name">
+                                        <span t-field="line.name"/>
+                                        <t t-set="variant_ids" t-value="line.product_id.mapped('product_template_variant_value_ids.display_name')"/>
+                                        <div class="font-weight-bold">
+                                            <span t-esc="', '.join(variant_ids)"/>
+                                        </div>
+
+                                        <div class="text-muted">
+                                            <span t-field="line.customisation_details"/>
+                                        </div>
+                                    </td>
+                                    <t t-if="doc.order_line and doc.state in ['draft','sent']">
+                                        <td name="td_delivery_time">
+                                            <span t-field="line.delivery_timelines"/>
+                                        </td>
+                                    </t>
+                                    <t t-else="">
+                                        <td name="td_delivery_date">
+                                            <span t-field="line.delivery_date"/>
+                                        </td>
+
+                                    </t>
+<!--                                    <td name="td_customisation_details">-->
+<!--                                        <span t-field="line.customisation_details"/>-->
+<!--                                    </td>-->
+                                    <td name="td_customisation_type">
+                                        <t t-foreach="line.customisation_type_ids" t-as="cust_type">
+                                            <span t-field="cust_type.name"/>,
+                                        </t>
+                                    </td>
+                                    <td name="td_quantity" class="text-right">
+                                        <span t-field="line.product_uom_qty"/>
+                                        <span t-field="line.product_uom"/>
+                                        <t t-set="total_qty" t-value="total_qty + line.product_uom_qty"/>
+                                        <t t-set="unit_of_measure" t-value="line.product_uom.name"/>
+                                    </td>
+                                </t>
+                                <t t-if="line.display_type == 'line_section'">
+                                    <td name="td_section_line" colspan="99">
+                                        <span t-field="line.name"/>
+                                    </td>
+                                </t>
+                                <t t-if="line.display_type == 'line_note'">
+                                    <td name="td_note_line" colspan="99">
+                                        <span t-field="line.name"/>
+                                    </td>
+                                </t>
+                            </tr>
+                        </t>
+                    </tbody>
+                </table>
+                <table name="total_qty_summary" class="table table-sm float-right" style="width:48.25%;">
+                    <tr class="border-black">
+                        <td style="width:25%;">
+                            <strong>Total Quantity</strong>
+                        </td>
+                        <td class="text-right" style="width:23.25%;">
+                            <span t-esc="total_qty"/>
+                            <span t-esc="unit_of_measure"/>
+                        </td>
+                    </tr>
+                </table>
+
+                <br/><br/><br/>
+                <t t-set="image_serial_no" t-value="1"/>
+                <table class="table table-sm float-left" style="width:40%;">
+                    <!-- In case we want to repeat the header, remove "display: table-row-group" -->
+                    <thead style="display: table-row-group">
+                        <tr>
+                            <th name="th_sno" style="width:10%" class="text-center">SNo.</th>
+                            <th name="th_image" class="text-center">Image</th>
+                        </tr>
+                    </thead>
+                    <tbody class="sale_tbody">
+                        <t t-foreach="doc.order_line" t-as="line">
+                            <tr t-att-class="'bg-200 font-weight-bold o_line_section' if line.display_type == 'line_section' else 'font-italic o_line_note' if line.display_type == 'line_note' else ''">
+                                <t t-if="not line.display_type">
+                                    <td name="td_sno" class="text-center">
+                                        <span t-esc="image_serial_no"/>
+                                        <t t-set="image_serial_no" t-value="image_serial_no+1"/>
+                                    </td>
+                                    <td name="td_image" class="text-center">
+                                        <img t-attf-src="data:image/*;base64,{{line.art_work_image}}" style="width: 50%;height: 10%;" />
+                                    </td>
+                                </t>
+                            </tr>
+                        </t>
+                    </tbody>
+                </table>
+
+
+
+            </div>
+        </t>
+    </template>
+
+    <template id="report_job_card">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-call="promokings_customisation.report_job_card_template" t-lang="doc.partner_id.lang"/>
+            </t>
+        </t>
+    </template>
+
+</odoo>

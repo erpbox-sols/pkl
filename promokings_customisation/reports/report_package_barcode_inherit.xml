@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="report_package_barcode_inherit" inherit_id="stock.report_package_barcode">
+        <xpath expr="//t[@t-foreach='docs']" position="replace">
+            <t t-set="count" t-value="1"/>
+            <t t-set="total_count" t-value="len(docs)"/>
+            <t t-foreach="docs" t-as="o">
+                <t>
+                    <div class="page">
+                        <div class="oe_structure"/>
+                        <table class="table table-condensed" style="border-bottom: 0px solid white !important;">
+                            <tr>
+                                <th>
+                                    <h1 t-field="o.name" class="mt0 float-left"/><h1> <span>&amp;nbsp;&amp;nbsp;<t t-esc="count"/> / <t t-esc="total_count"/></span></h1>
+                                    <t t-set="count" t-value="count + 1"/>
+                                </th>
+                                <th name="td_pk_barcode" style="text-align: center">
+                                    <div t-field="o.name" t-options="{'widget': 'barcode', 'width': 600, 'height': 100, 'img_style': 'width:300px;height:50px;'}"/>
+                                    <p t-field="o.name"/>
+                                </th>
+                            </tr>
+                        </table>
+                        <div class="row mt32 mb32">
+                            <div t-if="o.package_type_id" class="o_packaging_type col-auto">
+                                <strong>Package Type:</strong>
+                                <p t-field="o.package_type_id.name"/>
+                            </div>
+                            <div t-if="o.partner_id" class="o_partner_id col-auto">
+                                <strong>Customer:</strong>
+                                <p t-field="o.partner_id.name"/>
+                            </div>
+                            <div t-if="o.sale_order_id" class="o_packaging_type col-auto">
+                                <strong>Sale order:</strong>
+                                <p t-field="o.sale_order_id.name"/>
+                            </div>
+                        </div>
+                            <table class="table table-sm" style="border-bottom: 0px solid white !important;">
+                                <t t-set="has_serial_number" t-value="o.quant_ids.mapped('lot_id')" />
+                                <thead>
+                                    <tr>
+                                        <th>Product</th>
+                                        <th name="th_quantity" class="text-right">Quantity</th>
+                                        <th name="th_uom" groups="uom.group_uom"/>
+                                        <th name="th_serial" class="text-right" t-if="has_serial_number">Lot/Serial Number</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr t-foreach="o.quant_ids" t-as="l">
+                                        <td>
+                                           <span  t-field="l.product_id.name"/>
+                                        </td>
+                                        <td class="text-right">
+                                            <span t-field="l.quantity"/>
+                                        </td>
+                                        <td groups="uom.group_uom">
+                                            <span t-field="l.product_id.uom_id.name"/>
+                                        </td>
+                                        <td class="text-right" t-if="has_serial_number">
+                                            <t t-if="l.lot_id"><span t-field="l.lot_id.name"/></t>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                    </div>
+                </t>
+            </t>
+
+<!--            <table class="table table-sm" style="border-bottom: 0px solid white !important;">-->
+<!--                <t t-set="has_serial_number" t-value="o.quant_ids.mapped('lot_id')" />-->
+<!--                <thead>-->
+<!--                    <tr>-->
+<!--                        <th>Product</th>-->
+<!--                        <th name="th_quantity" class="text-right">Quantity</th>-->
+<!--                        <th name="th_uom" groups="uom.group_uom"/>-->
+<!--                        <th name="th_serial" class="text-right" t-if="has_serial_number">Lot/Serial Number</th>-->
+<!--                    </tr>-->
+<!--                </thead>-->
+<!--                <tbody>-->
+<!--                    <t t-foreach="docs" t-as="o">-->
+<!--                        <tr t-foreach="o.quant_ids" t-as="l">-->
+<!--                            <td>-->
+<!--                               <span  t-field="l.product_id.name"/>-->
+<!--                            </td>-->
+<!--                            <td class="text-right">-->
+<!--                                <span t-field="l.quantity"/>-->
+<!--                            </td>-->
+<!--                            <td groups="uom.group_uom">-->
+<!--                                <span t-field="l.product_id.uom_id.name"/>-->
+<!--                            </td>-->
+<!--                            <td class="text-right" t-if="has_serial_number">-->
+<!--                                <t t-if="l.lot_id"><span t-field="l.lot_id.name"/></t>-->
+<!--                            </td>-->
+<!--                        </tr>-->
+<!--                    </t>-->
+<!--                </tbody>-->
+<!--            </table>-->
+
+        </xpath>
+    </template>
+</odoo>

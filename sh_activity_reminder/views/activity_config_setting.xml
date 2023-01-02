@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+	<data>
+		<record id="sh_activity_reminder_config_view" model="ir.ui.view">
+			<field name="name">res.config.settings</field>
+			<field name="model">res.config.settings</field>
+			<field name="inherit_id" ref="base_setup.res_config_settings_view_form" />
+			<field name="arch" type="xml">
+				<xpath expr="//div[@data-key='general_settings']" position="inside">
+					<h2>Activity Reminder Configuration</h2>
+					<div class="row mt16 o_settings_container" id="activity_reminder_div">
+						<div class="col-12 col-lg-6 o_setting_box">
+							<div class="o_setting_left_pane">
+								<field name="sh_display_activity_reminder" />
+							</div>
+							<div class="o_setting_right_pane">
+								<label for="sh_display_activity_reminder" />
+								<div class="text-muted">
+								</div>
+							</div>
+						</div>
+						<div class="col-12 col-lg-6 o_setting_box">
+                            <div class="o_setting_right_pane">
+                                <div class="mt8">
+                                    <button name="%(sh_activity_reminder.sh_activity_alarm_action)d" icon="fa-arrow-right" type="action" string="Configure Activity Alarm" class="btn-link"/>
+                                </div>
+                            </div>
+                        </div>
+					</div>
+				</xpath>
+			</field>
+		</record>
+	</data>
+</odoo>

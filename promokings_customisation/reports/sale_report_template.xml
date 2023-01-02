@@ -1,0 +1,232 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="report_saleorder_document_inherit_promo_kings" inherit_id="sale.report_saleorder_document">
+        <xpath expr="//t[@t-set='display_discount']" position="after">
+            <t t-set="total_qty" t-value="0"/>
+            <t t-set="serial_no" t-value="1"/>
+        </xpath>
+        <xpath expr="//th[@name='th_description']" position="replace">
+            <th name="th_sno" style="width:5%" class="text-left">SNo.</th>
+<!--            <th name="th_image" style="width:15%" class="text-left">Image</th>-->
+            <th name="th_description" style="width:40%" class="text-left">Description</th>
+            <th name="th_cust_type" class="text-left">Cust. Type</th>
+        </xpath>
+        <xpath expr="//th[@name='th_taxes']" position="replace">
+            <th name="th_delivery_timelines" class="text-left">Timeline</th>
+        </xpath>
+        <xpath expr="//td[@name='td_taxes']" position="replace">
+            <t t-if="doc.order_line and doc.state in ['draft','sent']">
+                <td name="td_delivery_timelines" class="text-right">
+                    <span t-field="line.delivery_timelines"/>
+                </td>
+            </t>
+            <t t-else="">
+                <td name="td_delivery_time" class="text-right">
+                    <span t-field="line.delivery_date"/>
+                </td>
+            </t>
+
+        </xpath>
+        <xpath expr="//td[@name='td_name']" position="inside">
+            <t t-if="line.customisation_details">
+                - <span class="text-muted" t-field="line.customisation_details"/>
+            </t>
+            <t t-set="variant_ids" t-value="line.product_id.mapped('product_template_variant_value_ids.display_name')"/>
+            <t t-if="doc.order_line and doc.state not in ['draft','sent']">
+                <div class="font-weight-bold">
+                    <span t-esc="', '.join(variant_ids)"/>
+                </div>
+            </t>
+
+        </xpath>
+        <xpath expr="//td[@name='td_name']" position="after">
+            <td name="td_cust_type" class="text-left">
+                <span t-field="line.customisation_type_ids"/>
+            </td>
+        </xpath>
+<!--        <xpath expr="//td[@name='td_name']" position="before">-->
+<!--            <td name="td_image">-->
+<!--                <img t-attf-src="data:image/*;base64,{{line.art_work_image}}" style="width: 50%;height: 10%;" />-->
+<!--            </td>-->
+<!--        </xpath>-->
+        <xpath expr="//t[@t-if='not line.display_type']" position="before">
+            <td name="td_sno" class="text-center">
+                <span t-esc="serial_no"/>
+                <t t-set="serial_no" t-value="serial_no+1"/>
+            </td>
+        </xpath>
+        <xpath expr="//span[@t-field='line.product_uom']" position="after">
+            <t t-set="total_qty" t-value="total_qty + line.product_uom_qty"/>
+            <t t-set="unit_of_measure" t-value="line.product_uom.name"/>
+        </xpath>
+        <xpath expr="//div[@id='informations']/div[1]" position="after">
+            <div t-if="doc.estimated_po" class="col-auto col-3 mw-100 mb-2">
+                <strong>Estimated PO:</strong>
+                <p class="m-0" t-field="doc.estimated_po"/>
+            </div>
+        </xpath>
+        <xpath expr="//t[@t-foreach='doc.order_line']" position="after">
+            <tr class="border-black">
+                <td style="width:25%;" colspan="3">
+                    <strong>Total Quantity</strong>
+                </td>
+                <td class="text-right" style="width:23.25%;">
+                    <span t-esc="total_qty"/>
+                    <span t-esc="unit_of_measure"/>
+                </td>
+            </tr>
+
+        </xpath>
+
+
+        <xpath expr="//div[hasclass('clearfix')]" position="after">
+            <t t-if="doc.order_line and doc.state not in ['draft','sent']">
+                <t t-set="image_list" t-value="[]"/>
+                <t t-foreach="doc.order_line" t-as="line">
+                    <t t-if="line.art_work_image">
+                        <t t-set="image_list" t-value="image_list + [line.art_work_image]"/>
+                    </t>
+                </t>
+
+                <t t-set="new_image_list" t-value="[]"/>
+                <t t-set="adding_list" t-value="[]"/>
+                <t t-set="breaking_count" t-value="0"/>
+
+                <t t-foreach="image_list" t-as="images">
+                    <t t-if="breaking_count % 3 == 0 and breaking_count != 0">
+                        <t t-set="new_image_list" t-value="new_image_list + [adding_list]"/>
+                        <t t-set="adding_list" t-value="[]"/>
+                    </t>
+                    <t t-set="adding_list" t-value="adding_list + [images]"/>
+                    <t t-set="breaking_count" t-value="breaking_count + 1"/>
+                </t>
+
+
+                <t t-set="list_tail" t-value="len(image_list) % 3"/>
+                <t t-set="final_list_0" t-value="image_list[(list_tail * -1):]"/>
+                <t t-set="final_list_1" t-value="image_list[-3:]"/>
+
+                <t t-if="list_tail == 0">
+                    <t t-set="new_image_list" t-value="new_image_list + [final_list_1]"/>
+                </t>
+                <t t-else="">
+                    <t t-set="new_image_list" t-value="new_image_list + [final_list_0]"/>
+                </t>
+
+                <t t-set="image_list_count" t-value="image_list"/>
+                <t t-foreach="new_image_list" t-as="images">
+                    <div class="container">
+                        <div class="row col-12">
+                            <table class="table" style="border: none;">
+                                <thead>
+                                    <tr>
+                                         <th name="td_sno" style="border: none; width: 33%; height: 10%" class="text-center">
+                                            <t t-if="len(images) > 0">
+                                                <span t-esc="image_list_count.index(images[0]) + 1"/>
+                                             </t>
+                                        </th>
+                                         <th name="td_sno" style="border: none; width: 33%; height: 10%" class="text-center">
+                                            <t t-if="len(images) > 1">
+                                                <span t-esc="image_list_count.index(images[1]) + 1"/>
+                                             </t>
+                                        </th>
+                                         <th name="td_sno" style="border: none; width: 33%; height: 10%" class="text-center">
+                                            <t t-if="len(images) > 2">
+                                                <span t-esc="image_list_count.index(images[2]) + 1"/>
+                                             </t>
+                                        </th>
+
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <t t-if="len(images) > 0">
+                                            <td style="border: none;" name="td_image" class="text-center">
+                                                    <img t-attf-src="data:image/*;base64,{{images[0]}}" style="width:50%;"/>
+                                            </td>
+                                        </t>
+                                        <t t-if="len(images) > 1">
+                                            <td style="border: none;" name="td_image" class="text-center">
+                                                    <img t-attf-src="data:image/*;base64,{{images[1]}}" style="width:50%;"/>
+                                            </td>
+                                        </t>
+                                        <t t-if="len(images) > 2">
+                                            <td style="border: none;" name="td_image" class="text-center">
+                                                    <img t-attf-src="data:image/*;base64,{{images[2]}}" style="width:50%;"/>
+                                            </td>
+                                        </t>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </t>
+            </t>
+        </xpath>
+<!--        <xpath expr="//div[@name='so_total_summary']" position="before">-->
+<!--            <table name="total_qty_summary" class="table table-sm" style="width:77%">-->
+<!--                <tr class="border-black">-->
+<!--                    <td style="width:25%;">-->
+<!--                        <strong>Total Quantity</strong>-->
+<!--                    </td>-->
+<!--                    <td class="text-right" style="width:23.25%;">-->
+<!--                        <span t-esc="total_qty"/>-->
+<!--                        <span t-esc="unit_of_measure"/>-->
+<!--                    </td>-->
+<!--                </tr>-->
+<!--            </table>-->
+<!--        </xpath>-->
+    </template>
+
+    <template id="external_layout_bold_inherit_promo_kings" inherit_id="web.external_layout_bold">
+        <xpath expr="//div[hasclass('o_clean_header')]" position="replace">
+            <div class="o_clean_header">
+            <div class="row">
+                <div class="col-6" name="company_address">
+                    <t t-if="company.company_details">
+                        <t t-esc="company.company_details"/>
+                    </t>
+<!--                    <ul class="list-unstyled">-->
+<!--                        <strong><li t-if="company.name"><span t-field="company.name"/></li></strong>-->
+<!--                        <li t-if="forced_vat or company.vat">-->
+<!--                            <t t-esc="company.country_id.vat_label or 'Tax ID'"/>:-->
+<!--                            <span t-if="forced_vat" t-esc="forced_vat"/>-->
+<!--                            <span t-else="" t-field="company.vat"/>-->
+<!--                        </li>-->
+<!--                        <li t-if="company.phone">Tel: <span class="o_force_ltr" t-field="company.phone"/></li>-->
+<!--                        <li t-if="company.email"><span t-field="company.email"/></li>-->
+<!--                        <li t-if="company.website"><span t-field="company.website"/></li>-->
+<!--                    </ul>-->
+                </div>
+                <div class="col-5 offset-1">
+                    <img t-if="company.logo" t-att-src="image_data_uri(company.logo)" alt="Logo"/>
+                </div>
+            </div>
+            </div>
+        </xpath>
+        <xpath expr="//span[@t-field='company.company_details']" position="replace">
+
+        </xpath>
+        <xpath expr="//div[contains(@t-attf-class, 'o_clean_footer')]" position="replace">
+            <div t-attf-class="footer o_clean_footer o_company_#{company.id}_layout">
+                <div class="row">
+                    <div class="col-8">
+                        <span t-field="company.report_footer"/>
+                    </div>
+<!--                    <div class="col-4">-->
+<!--                        <span t-if="company.company_details" t-field="company.company_details"/>-->
+<!--                    </div>-->
+                    <div class="col-3">
+                        <h5 class="mt0 mb0" t-field="company.report_header"/>
+                    </div>
+                    <div class="col-1">
+                        <ul t-if="report_type == 'pdf'" class="list-inline pagenumber float-right text-center">
+                            <li class="list-inline-item"><strong><span class="page"/></strong></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </xpath>
+
+    </template>
+</odoo>

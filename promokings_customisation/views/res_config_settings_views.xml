@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="res_config_settings_view_form_inherit_promo_kings" model="ir.ui.view">
+            <field name="name">res.config.settings.view.form.inherit.promo.kings</field>
+            <field name="model">res.config.settings</field>
+            <field name="priority" eval="40"/>
+            <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+            <field name="arch" type="xml">
+            <xpath expr="//div[@id='use_invoice_terms']" position="after">
+<!--                <div class="app_settings_block" data-string="terms_condition" string="Terms and Condition" data-key="terms_condition" groups="">-->
+<!--                    <h2>Terms and Condition</h2>-->
+<!--                    <div class="row mt16 o_settings_container">-->
+                                <div class="col-12 col-lg-6 o_setting_box" title="Sale Terms and Condition">
+                                    <div class="o_setting_left_pane">
+                                        <field name="is_sale_terms_condition"/>
+                                    </div>
+
+                                    <div class="o_setting_right_pane">
+                                        <span class="o_form_label">Sales Terms and Condition</span>
+                                        <div class="text-muted">
+                                            Enter sale order terms and condition.
+                                        </div>
+                                        <div attrs="{'invisible': [('is_sale_terms_condition','=',False)]}">
+                                            <field name="sale_terms_condition" widget="html" class="oe_account_terms mt-5 w-100"/>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-lg-6 o_setting_box" title="Purchase Terms and Condition">
+                                    <div class="o_setting_left_pane">
+                                        <field name="is_purchase_terms_condition"/>
+                                    </div>
+
+                                    <div class="o_setting_right_pane">
+                                        <span class="o_form_label">Purchase Terms and Condition</span>
+                                        <div class="text-muted">
+                                            Enter purchase terms and condition.
+                                        </div>
+                                        <div attrs="{'invisible': [('is_purchase_terms_condition','=',False)]}">
+                                            <field name="purchase_terms_condition" widget="html" class="oe_account_terms mt-5 w-100"/>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-lg-6 o_setting_box" title="Invoice Terms and Condition">
+                                    <div class="o_setting_left_pane">
+                                        <field name="is_invoice_terms_condition"/>
+                                    </div>
+
+                                    <div class="o_setting_right_pane">
+                                        <span class="o_form_label">Invoice Terms and Condition</span>
+                                        <div class="text-muted">
+                                            Enter invoice terms and condition.
+                                        </div>
+                                        <div attrs="{'invisible': [('is_invoice_terms_condition','=',False)]}">
+                                            <field name="invoice_terms_condition" widget="html" class="oe_account_terms mt-5 w-100"/>
+                                        </div>
+                                    </div>
+                                </div>
+<!--                    </div>-->
+<!--                </div>-->
+            </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>

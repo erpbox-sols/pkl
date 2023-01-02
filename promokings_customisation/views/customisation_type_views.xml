@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_customisation_type_form" model="ir.ui.view">
+        <field name="name">customisation.type.view.form</field>
+        <field name="model">customisation.type</field>
+        <field name="arch" type="xml">
+            <form string="Customisation Type">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_customisation_type" model="ir.actions.act_window">
+        <field name="name">Customisation Type</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">customisation.type</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Add a new customisation type
+            </p>
+        </field>
+    </record>
+
+    <menuitem id="menu_customisation_type" name="Customisation Type" parent="sale.menu_sale_config" sequence="999"
+              action="action_customisation_type"/>
+
+</odoo>

@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="report_invoice_document_inherit_promo_kings" inherit_id="account.report_invoice_document">
+        <xpath expr="//t[@t-set='display_discount']" position="after">
+            <t t-set="total_qty" t-value="0"/>
+            <t t-set="serial_no" t-value="1"/>
+        </xpath>
+        <xpath expr="//th[@name='th_description']" position="before">
+            <th name="th_sno" style="width: 6%;" class="text-left">SNo.</th>
+        </xpath>
+        <xpath expr="//td[@name='account_invoice_line_name']" position="before">
+            <td name="td_sno" class="text-center">
+                <span t-esc="serial_no"/>
+                <t t-set="serial_no" t-value="serial_no+1"/>
+            </td>
+        </xpath>
+        <p name="payment_communication" position="replace"/>
+        <p name="payment_term" position="replace"/>
+        <div name="comment" position="replace"/>
+        <div class='clearfix' position="after">
+            <table class="table">
+                <td style="font-size: 8px !important" width="50%">
+                    <span>
+                        <b>Terms &amp; Conditions:</b>
+                        <t t-esc="o.narration"/>
+                    </span>
+                </td>
+                <td style="font-size: 8px !important;line-height: 1; right:0px" align="right" width="50%" >
+                    <div width="20px" height="20px" style="text-align: left; margin-left: 70%">
+                        <b>Payment Terms</b><br/>
+                        <b>A/C NAME</b>    :  PROMO KINGS LTD<br/>
+                        <b>BANK NAME</b>   :  PRIME BANK LTD<br/>
+                        <b>A/C NO.KSH</b>  :  3000105843<br/>
+                        <b>A/C NO USD</b>  :  3001105859<br/>
+                        <b>SWIFT CODE</b>  :  PRIEKENX<br/>
+                        <b>BRANCH CODE</b> :  008<br/>
+                        <b>BANK CODE</b>   :  10<br/>
+                        <br/>
+                        <b>AND/OR</b><br/><br/>
+                        <b>Paybill</b>     :  321444<br/>
+                        <b>A/C Name</b>    : "NAME / INV NO.<br/>
+                    </div>
+                </td>
+            </table>
+        </div>
+        <xpath expr="//div[hasclass('page')]/h2" position="replace">
+            <h5>
+                <span t-if="o.move_type == 'out_invoice' and o.state == 'posted'">Invoice:</span>
+                <span t-if="o.move_type == 'out_invoice' and o.state == 'draft'">Draft Invoice</span>
+                <span t-if="o.move_type == 'out_invoice' and o.state == 'cancel'">Cancelled Invoice</span>
+                <span t-if="o.move_type == 'out_refund'">Credit Note</span>
+                <span t-if="o.move_type == 'in_refund'">Vendor Credit Note</span>
+                <span t-if="o.move_type == 'in_invoice'">Vendor Bill</span>
+                <span t-if="o.name != '/'" t-field="o.name"/>
+            </h5>
+        </xpath>
+        <xpath expr="//span[@t-field='line.product_uom_id']" position="after">
+            <t t-set="total_qty" t-value="total_qty + line.quantity"/>
+            <t t-set="unit_of_measure" t-value="line.product_uom_id.name"/>
+        </xpath>
+
+<!--        <xpath expr="//span[@t-field='line.price_subtotal']" position="replace">-->
+<!--            <t t-set="price_su_total" t-value="str(line.price_subtotal)"/>-->
+<!--            <span class="text-nowrap" t-esc="price_su_total.split(' ')[0]" groups="account.group_show_line_subtotals_tax_excluded"/>-->
+<!--        </xpath>-->
+<!--        <xpath expr="//span[@t-field='line.price_total']" position="replace">-->
+<!--            <t t-set="price_total" t-value="str(line.price_total)"/>-->
+<!--            <span class="text-nowrap" t-esc="price_total.split(' ')[0]" groups="account.group_show_line_subtotals_tax_included"/>-->
+<!--        </xpath>-->
+        <xpath expr="//tbody/t/tr/t/td[hasclass('o_price_total')]" position="replace">
+            <t t-set="price_subtotal" t-value="str(line.price_subtotal)"/>
+            <t t-set="price_total" t-value="str(line.price_total)"/>
+            <td class="text-right o_price_total">
+
+                <span class="text-nowrap" t-field="line.currency_id.symbol" groups="account.group_show_line_subtotals_tax_excluded"/>
+                <span class="text-nowrap" t-esc="price_subtotal" groups="account.group_show_line_subtotals_tax_excluded"/>
+                <span class="text-nowrap" t-field="line.currency_id.symbol" groups="account.group_show_line_subtotals_tax_included"/>
+                <span class="text-nowrap" t-esc="price_total" groups="account.group_show_line_subtotals_tax_included"/>
+            </td>
+
+        </xpath>
+
+        <xpath expr="//div[@id='informations']/div[@name='origin']/strong" position="replace">
+            <strong>Job Number:</strong>
+        </xpath>
+        <xpath expr="//div[@id='informations']/div[@name='reference']/strong" position="replace">
+            <strong>Buyer Reference:</strong>
+        </xpath>
+        <xpath expr="//div[@id='informations']/div[@name='origin']" position="after">
+            <div class="col-3 mw-100 mb-2" style="width:20%" t-if="o.picking_ids" name="picking">
+                <strong>Delivery Note No:</strong>
+                <p class="m-0" t-esc="o.get_picking_name()"/>
+            </div>
+        </xpath>
+        <xpath expr="//div[@id='informations']/div[@name='reference']" position="after">
+            <div class="col-auto col-3 mw-100 mb-2" t-if="o.invoice_user_id" name="sales_person">
+                <strong>Sales Person:</strong>
+                <p class="m-0" t-field="o.invoice_user_id.name"/>
+            </div>
+        </xpath>
+        <xpath expr="//th[@name='th_taxes']" position="replace"/>
+        <xpath expr="//t[@name='account_invoice_line_accountable']/td[6]" position="replace"/>
+        <xpath expr="//span[@t-field='line.quantity']" position="replace">
+            <span t-esc="'%.0f'% line.quantity"/>
+        </xpath>
+        <xpath expr="//span[@t-field='line.price_unit']" position="replace">
+            <span class="text-nowrap" t-esc="'%.2f'% line.price_unit"/>
+        </xpath>
+
+        <!--Added below xpath for adding total quantity in the table-->
+        <xpath expr="//t[@t-foreach='lines']" position="after">
+            <tr class="border-black">
+                <td colspan="2">
+                    <strong>Total Quantity</strong>
+                </td>
+                <td class="text-right">
+                    <span t-esc="total_qty"/>
+                    <span t-esc="unit_of_measure"/>
+                </td>
+            </tr>
+        </xpath>
+
+    </template>
+
+
+    <template id="document_tax_totals_inherit" inherit_id="account.document_tax_totals">
+
+        <xpath expr="//tr[hasclass('o_subtotal')]" position="replace">
+            <tr class="border-black o_subtotal">
+                <td><strong t-esc="subtotal['name']"/></td>
+
+                <td class="text-right">
+                    <span t-field="o.currency_id.symbol"/>
+                    <span
+                        t-att-class="oe_subtotal_footer_separator"
+                        t-esc="subtotal['amount']"
+                    />
+                </td>
+            </tr>
+
+        </xpath>
+        <xpath expr="//tr[hasclass('o_total')]" position="replace">
+            <td><strong>Total</strong></td>
+            <td class="text-right">
+                <span t-field="o.currency_id.symbol"/>
+                <span t-esc="tax_totals['amount_total']"/>
+            </td>
+
+        </xpath>
+    </template>
+
+    <template id="document_tax_groups_totals_inherit" inherit_id="account.tax_groups_totals">
+
+        <xpath expr="//tr" position="replace">
+            <tr>
+                <t t-if="len(tax_totals['groups_by_subtotal'][subtotal_to_show]) > 1">
+                    <td>
+                        <span t-esc="amount_by_group['tax_group_name']"/>
+                        <span class="text-nowrap"> on
+                            <t t-esc="amount_by_group['tax_group_base_amount']"/>
+                        </span>
+                    </td>
+                    <td class="text-right o_price_total">
+                        <span t-field="o.currency_id.symbol"/>
+                        <span class="text-nowrap" t-esc="amount_by_group['tax_group_amount']"/>
+                    </td>
+                </t>
+                <t t-else="">
+                    <td><span class="text-nowrap" t-esc="amount_by_group['tax_group_name']"/></td>
+                    <td class="text-right o_price_total">
+                        <span t-field="o.currency_id.symbol"/>
+                        <span class="text-nowrap" t-esc="amount_by_group['tax_group_amount']" />
+                    </td>
+                </t>
+            </tr>
+
+        </xpath>
+    </template>
+
+
+
+    <template id="report_external_layout_bold_promo_kings" inherit_id="web.external_layout_bold">
+        <xpath expr="//div[hasclass('row')]/div[1]" position="replace">
+            <div class="col-5 offset-1" name="company_address">
+                <t t-esc="company.company_details"/>
+<!--                <ul class="list-unstyled">-->
+<!--                    <strong><li t-if="company.name"><span t-field="company.name"/></li></strong>-->
+<!--                    <li t-if="forced_vat or company.vat">-->
+<!--                        <t t-esc="company.country_id.vat_label or 'Tax ID'"/>:-->
+<!--                        <span t-if="forced_vat" t-esc="forced_vat"/>-->
+<!--                        <span t-field="company.vat"/>-->
+<!--                    </li>-->
+<!--                    <li t-if="company.phone">Tel: <span class="o_force_ltr" t-field="company.phone"/></li>-->
+<!--                    <li t-if="company.email"><span t-field="company.email"/></li>-->
+<!--                    <li t-if="company.website"><span t-field="company.website"/></li>-->
+<!--                </ul>-->
+            </div>
+        </xpath>
+    </template>
+</odoo>

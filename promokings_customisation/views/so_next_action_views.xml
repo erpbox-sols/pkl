@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_so_next_action_form" model="ir.ui.view">
+        <field name="name">so.next.action.view.form</field>
+        <field name="model">so.next.action</field>
+        <field name="arch" type="xml">
+            <form string="Sale Order Next Action">
+                <header>
+                    <button string="Confirm" name="confirm_sale_order" type="object" class="oe_highlight"
+                            attrs="{'invisible': [('state', '=', 'so_created')]}"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,so_created"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1>
+                            <field name="name"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="sale_order_id"/>
+                        </group>
+                    </group>
+                    <field name="next_action_line_ids">
+                        <tree editable="bottom">
+                            <field name="product_id"
+                                   options="{'no_create_edit': True,'no_create': True, 'no_open': True}"
+                                   attrs="{'readonly': [('next_action_done', '=', True)]}"/>
+                            <field name="next_action" attrs="{'readonly': [('next_action_done', '=', True)]}"/>
+                            <field name="customise" readonly="1" force_save="1"/>
+                            <field name="customisation_details"
+                                   attrs="{'readonly': [('next_action_done', '=', True)]}"/>
+                            <field name="customisation_type_ids" widget="many2many_tags" readonly="1" force_save="1"/>
+                            <field name="art_work_image" widget="image" style="height:100px ;width:100px;" readonly="1"
+                                   force_save="1" optional="hide"/>
+                            <field name="partner_id"
+                                   attrs="{'invisible': [('next_action', '!=', 'buy')], 'readonly': ['|', ('next_action', '!=', 'buy'), ('next_action_done', '=', True)], 'required': [('next_action', '=', 'buy')]}"/>
+                            <field name="linked_product_id" attrs="{'required': [('next_action', '!=', False)]}"/>
+                            <field name="qty_ordered" readonly="1" force_save="1"/>
+                            <field name="qty_to_do" readonly="1" force_save="1"/>
+                            <field name="qty_to_next_action" attrs="{'readonly': [('next_action_done', '=', True)]}"/>
+                            <field name="qty_remaining" readonly="1" force_save="1"/>
+                            <field name="product_uom_id" readonly="1" force_save="1" optional="hide"/>
+                            <field name="price_unit" readonly="1" force_save="1" optional="hide"/>
+                            <field name="next_action_done" readonly="1"/>
+                        </tree>
+                    </field>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_so_next_action" model="ir.actions.act_window">
+        <field name="name">SO Next Action</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">so.next.action</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Add a new sale order next action
+            </p>
+        </field>
+    </record>
+
+    <menuitem id="menu_so_next_action" name="SO Next Action" parent="sale.sale_order_menu" sequence="999"
+              action="action_so_next_action" groups="promokings_customisation.group_next_action_planning_officer"/>
+
+</odoo>

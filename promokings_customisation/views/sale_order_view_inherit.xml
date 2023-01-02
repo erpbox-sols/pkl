@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_order_form_inherit" model="ir.ui.view">
+        <field name="name">view.order.form.inherit</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='state']" position="replace">
+                <field name="state" widget="statusbar" statusbar_visible="draft,sent,quotation_confirmed,sale"/>
+            </xpath>
+            <field name="client_order_ref" position="attributes">
+<!--                <attribute name="required">1</attribute>-->
+                <attribute name="attrs">{'required':[('state', '=', 'quotation_confirmed')]}</attribute>
+            </field>
+            <field name="client_order_ref" position="after">
+                <field name="estimated_po" attrs="{'required':[('state','=', 'quotation_confirmed')]}"/>
+            </field>
+
+            <xpath expr="//header/button[@name='action_confirm'][1]" position="attributes">
+<!--                <attribute name="attrs">{'invisible': [('state', 'not in', ['quotation_confirmed'])]}</attribute>-->
+                <attribute name="attrs">{'invisible': True}</attribute>
+            </xpath>
+
+            <xpath expr="//header/button[@name='action_confirm'][2]" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+
+            <xpath expr="//header/button[@name='action_confirm']" position="after">
+                <button name="button_quotation_confirm" type="object" string="Confirm Quotation" class="btn-primary"
+                        attrs="{'invisible': [('state', 'not in', ['draft', 'sent'])]}"/>
+                <button name="button_open_multiple_so_creation_wizard" type="object" string="Create SO"
+                        class="btn-primary"
+                        attrs="{'invisible': ['|', ('state', 'not in', ['quotation_confirmed']), ('parent_so_id', '!=', False)]}"/>
+            </xpath>
+
+            <xpath expr="//header/button[@name='action_cancel']" position="attributes">
+                <attribute name="attrs">{'invisible': ['|', ('state', 'not in', ['draft', 'sent', 'quotation_confirmed', 'sale']), ('id', '=', False)]}</attribute>
+            </xpath>
+
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button name="action_view_manufacturing_orders"
+                        type="object"
+                        class="oe_stat_button"
+                        icon="fa-wrench"
+                        attrs="{'invisible': [('manufacturing_order_count', '=', 0)]}">
+                    <field name="manufacturing_order_count" widget="statinfo" string="Manufacturing"/>
+                </button>
+                <button name="action_view_child_so_orders"
+                        type="object"
+                        class="oe_stat_button"
+                        icon="fa-dollar"
+                        attrs="{'invisible': [('child_so_count', '=', 0)]}">
+                    <field name="child_so_count" widget="statinfo" string="Sale Orders"/>
+                </button>
+                <button name="action_view_next_action_plans"
+                        type="object"
+                        class="oe_stat_button"
+                        icon="fa-tasks"
+                        attrs="{'invisible': [('next_action_count', '=', 0)]}"
+                        groups="promokings_customisation.group_next_action_planning_officer">
+                    <field name="next_action_count" widget="statinfo" string="Next Action Plans"/>
+                </button>
+            </xpath>
+
+            <field name="tag_ids" position="after">
+                <field name="parent_so_id"/>
+            </field>
+
+            <xpath expr="//field[@name='order_line']" position="attributes">
+                <attribute name="attrs">{'readonly': [('state', 'in', ['sale', 'cancel', 'done'])]}</attribute>
+            </xpath>
+            <xpath expr="//field[@name='commitment_date']" position="attributes">
+                <attribute name="attrs">{'required':[('state','=', 'quotation_confirmed')]}</attribute>
+            </xpath>
+
+            <xpath expr="//notebook/page[@name='order_lines']/field[@name='order_line']/tree/field[@name='product_id']"
+                   position="attributes">
+                <attribute name="attrs">
+                    {'readonly': [('product_updatable', '=', False)], 'column_invisible': [('parent.state', 'in',
+                    ('draft', 'sent'))]}
+                </attribute>
+            </xpath>
+
+            <xpath expr="//notebook/page[@name='order_lines']/field[@name='order_line']/tree/field[@name='product_template_id']"
+                   position="replace">
+                <field name="product_template_id" string="Parent Product"
+                       attrs="{'readonly': [('product_updatable', '=', False)],'required': [('display_type', '=', False)]}"
+                       context="{
+                          'partner_id': parent.partner_id,
+                          'quantity': product_uom_qty,
+                          'pricelist': parent.pricelist_id,
+                          'uom':product_uom,
+                          'company_id': parent.company_id,
+                          'default_list_price': price_unit,
+                          'default_description_sale': name
+                       }"
+                       domain="[('sale_ok', '=', True), '|', ('company_id', '=', False), ('company_id', '=', parent.company_id)]"
+                       widget="product_configurator"/>
+            </xpath>
+
+            <xpath expr="//notebook/page[@name='order_lines']/field[@name='order_line']/tree/field[@name='name']"
+                   position="after">
+                <field name="customise" attrs="{'required': True}"/>
+                <field name="customisation_details"/>
+                <field name="customisation_type_ids" widget="many2many_tags" options="{'no_create': True}" attrs="{'required': True}"/>
+                <field name="art_work_image" widget="image" style="height:100px ;width:100px;" attrs="{'required':[('state','=', 'quotation_confirmed')]}"/>
+            </xpath>
+
+            <xpath expr="//notebook/page[@name='order_lines']/field[@name='order_line']/tree/field[@name='product_uom_qty']"
+                   position="after">
+                <field name="qty_remaining" readonly="1"
+                       attrs="{'column_invisible': [('parent.parent_so_id', '!=', False)]}"/>
+            </xpath>
+            <xpath expr="//notebook/page[@name='order_lines']/field[@name='order_line']/tree/field[@name='tax_id']"
+                   position="after">
+                <field name="delivery_timelines" attrs="{'column_invisible': [('parent.state', 'not in', ['draft', 'sent'])], 'required': True}"/>
+                <field name="delivery_date" attrs="{'column_invisible': [('parent.state', 'in', ['draft', 'sent'])]}"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

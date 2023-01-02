@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record model='ir.ui.view' id='wizard_core_dynamic_fields_form'>
+        <field name="name">import.inv.new</field>
+        <field name="model">import.inv.new</field>
+        <field name="arch" type="xml">
+            <form string="Import">
+                <sheet>
+                    <group>
+                        <group string="Import">
+                            <field name="file"/>
+                            <field name="number"/>
+                        </group>
+                    </group>
+                </sheet>
+                <footer>
+                    <button name="import_inv" string="Import" type="object" class="oe_highlight"/>
+                    <button name="run_the_code" string="RUN" type="object" class="oe_highlight"/>
+                    or
+                    <button string="Cancel" class="oe_link" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record model='ir.actions.act_window' id='action_dynamic_config'>
+        <field name="name">Import</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">import.inv.new</field>
+        <field name="view_mode">form</field>
+<!--        <field name="view_id" ref="wizard_core_dynamic_fields_form"/>-->
+        <field name="target">new</field>
+    </record>
+
+    <menuitem id="action_core_dynamic_fields"
+              name="Import"
+              action="action_dynamic_config"
+              parent="base.menu_administration"
+              groups="base.group_user"
+              sequence="2"/>
+</odoo>

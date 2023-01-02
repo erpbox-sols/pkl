@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="report_mrporder_inherit" inherit_id="mrp.report_mrporder">
+        <xpath expr="//div[hasclass('page')]" position="inside">
+
+            <!--For adding product images on the report-->
+            <br/>
+            <table class="table table-sm float-left" style="width:40%;">
+                <t t-set="has_product_barcode" t-value="any(m.product_id.barcode for m in o.move_raw_ids)"/>
+                <thead>
+                    <tr style="border: none;">
+                        <th>Images</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <t t-if="o.message_main_attachment_id">
+                        <tr t-foreach="o.message_main_attachment_id" t-as="raw_line">
+                            <t t-if="raw_line.type == 'binary'">
+                                <td style="border: none;">
+                                    <img t-attf-src="data:image/*;base64,{{raw_line.datas}}" style="width: 50%;height: 20%;" />
+                                </td>
+                            </t>
+                        </tr>
+                    </t>
+                </tbody>
+            </table>
+
+        </xpath>
+    </template>
+</odoo>

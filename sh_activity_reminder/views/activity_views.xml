@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="sh_mail_activity_type_view_form_inherit" model="ir.ui.view">
+        <field name="name">sh.mail.activity.inherit</field>
+        <field name="model">mail.activity</field>
+        <field name="inherit_id" ref="mail.mail_activity_view_form_popup" />
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='user_id']" position="after">
+                <field name="company_id" invisible="1" />
+            </xpath>
+            <xpath expr="//field[@name='summary']" position="after">
+            	<field name="sh_activity_alarm_ids" widget="many2many_tags" groups="sh_activity_reminder.group_activity_alarm"/>
+            </xpath>
+            <field name="date_deadline" position="after">
+            	<field name="sh_date_deadline" groups="sh_activity_reminder.group_activity_alarm"/>
+            </field>
+        </field>
+    </record>
+</odoo>
